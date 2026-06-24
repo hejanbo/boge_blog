@@ -1,0 +1,80 @@
+from datetime import datetime
+
+from pydantic import BaseModel, Field
+
+from app.schemas.common import BasePageParam
+
+
+class CategoryParam(BaseModel):
+    id: int = Field(..., description="分类ID")
+    name: str = Field(..., description="分类名称", max_length=64)
+
+    class Config:
+        from_attributes = True
+
+class TagParam(BaseModel):
+    id: int = Field(..., description="标签ID")
+    name: str = Field(..., description="标签名称", max_length=64)
+
+    class Config:
+        from_attributes = True
+
+class ArticlePageItemResult(BaseModel):
+    id: int = Field(..., description="文章ID")
+    title: str = Field(..., description="文章标题", max_length=128)
+    intro: str = Field(..., description="文章摘要", max_length=256)
+    view_count: int = Field(..., description="文章浏览量")
+    created_at: datetime = Field(..., description="创建时间")
+    updated_at: datetime = Field(..., description="更新时间")
+    category: CategoryParam = Field(..., description="分类")
+    tags: list[TagParam] | None = Field(default=[], description="标签列表")
+
+    class Config:
+        from_attributes = True
+        json_encoders = {
+            datetime: lambda v: v.strftime("%Y-%m-%d %H:%M:%S")
+        }
+
+class ArticleDetailResult(BaseModel):
+    id: int = Field(..., description="文章ID")
+    title: str = Field(..., description="文章标题", max_length=128)
+    content: str = Field(..., description="文章内容", max_length=10000)
+    view_count: int = Field(..., description="文章浏览量")
+
+    seo_title: str = Field(description="SEO标题")
+    seo_keywords: str = Field(description="SEO关键字")
+    seo_description: str = Field(description="SEO描述")
+
+    category: CategoryParam = Field(..., description="分类")
+    created_at: datetime = Field(..., description="创建时间")
+    updated_at: datetime = Field(..., description="更新时间")
+
+
+    class Config:
+        from_attributes = True
+        json_encoders = {
+            datetime: lambda v: v.strftime("%Y-%m-%d %H:%M:%S")
+        }
+
+class ArticlePageParam(BasePageParam):
+    category_id: int | None = Field(default=None, description="分类ID")
+    tag_id: int | None = Field(default=None, description="标签ID")
+    title: str | None = Field(default='', description="文章标题")
+
+class ArticlePydantic(BaseModel):
+    id: int = Field(..., description="文章ID")
+    title: str = Field(..., description="文章标题", max_length=128)
+    intro: str = Field(..., description="文章摘要", max_length=256)
+    status: int = Field(..., description="文章状态 0-未发布 1-已发布")
+    content: str = Field(..., description="文章内容", max_length=10000)
+    seo_title: str = Field(description="SEO标题")
+    seo_keywords: str = Field(description="SEO关键字")
+    seo_description: str = Field(description="SEO描述")
+    view_count: int = Field(..., description="文章浏览量")
+    created_at: datetime = Field(..., description="创建时间")
+    updated_at: datetime = Field(..., description="更新时间")
+    category: CategoryParam = Field(..., description="分类")
+    tags: list[TagParam] | None = Field(default=[], description="标签列表")
+
+    class Config:
+        from_attributes = True
